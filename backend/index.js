@@ -1,16 +1,16 @@
 const express = require("express");
-const axios = require("axios"); 
+const axios = require("axios");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const { IgApiClient } = require("instagram-private-api");
 
 dotenv.config();
-const app = express();
+const app = express();  
 
 // Use CORS
 app.use(cors());
 app.use(express.json()); // For parsing application/json
- 
+//  getting similar users:
 
 // Login to Instagram before handling requests
 const ig = new IgApiClient();
@@ -25,7 +25,6 @@ const loginToInstagram = async (username, password) => {
     throw new Error(`Failed to log in: ${error.message}`);
   }
 };
- 
 
 // Endpoint to get user data
 app.get("/user-info", async (req, res) => {
@@ -45,9 +44,7 @@ app.get("/user-info", async (req, res) => {
   try {
     const nickname = "simply_sander";
     const userId = await ig.user.getIdByUsername(nickname);
-
-    // const userId = "61933666476"; // Example user ID; replace with dynamic input if needed
-
+ 
     // Use the ig.user method to get user info
     const userInfo = await ig.user.info(userId);
 
@@ -58,48 +55,38 @@ app.get("/user-info", async (req, res) => {
     res.status(500).send("Error fetching user data");
   }
 });
+// // https://www.instagram.com/graphql/query/?query_id=17845312237175864&variables={"id":"210412485"}
+// // Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36
 
-// Route to fetch user profile info via Instagram Graph API - access token problem, or something related!!! -> doesn't work
-app.get("/profile/:username", async (req, res) => {
-  const { username } = req.params;
-  const accessToken = process.env.ACCESS_TOKEN;
+// Use the provided Instagram cookie
+const instagramCookie = `ig_nrcb=1; datr=sxUBZxNp0EPhkFnYLBY0-gFt; ig_did=2C42E4C3-0ABF-448B-91B1-30F1A004D2D0; mid=ZwEVtQAEAAEL8Bzv3K0zW9KT8Lrj; dpr=1; csrftoken=RLFcXjjaMgrli2Zp2IYdclFqXPx0xvKD; ds_user_id=61933666476; ps_l=1; ps_n=1; shbid="15080\x2C61933666476\x2C1759864412:01f72461f836edbb066734973f0e64891102ee25d889ffd4bb8e5a83cc9b116f83d36dbc"; shbts="1728328412\x2C61933666476\x2C1759864412:01f7fe1f80a35acd8a1435edcb532f5622c0a09337be2320a7257281ae98af4cd120592a"; sessionid=61933666476%3AxbCORvcaUdeJiq%3A17%3AAYch2SMr_w6Hajpf49qtB-El1ulTJf4dMu8ekDeFig; wd=1391x496; rur="LDC\x2C61933666476\x2C1760039126:01f76677487692af10d70d6a73c2351d8f6db4e195a7c40083b3cbe9d7685f70e747b3ad"`;
+
+// Endpoint to get similar users
+app.get("/similar-users", async (req, res) => {
+  const queryParams = {
+    query_id: "17845312237175864", // Query ID for similar users
+    variables: JSON.stringify({ id: "210412485" }), // User ID for fetching similar users
+  };
+
+  const headers = {
+    Accept: "application/json",
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    Cookie: instagramCookie, // Use the provided static cookie
+  };
 
   try {
     const response = await axios.get(
-      `https://graph.instagram.com/${username}?fields=id,username,followers_count,bio,media_count&access_token=${accessToken}`
+      `https://www.instagram.com/graphql/query/`,
+      {
+        params: queryParams,
+        headers: headers,
+      }
     );
     res.json(response.data);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).send("Error fetching user profile");
-  }
-});
-
-// Route for Instagram OAuth Authentication
-app.get("/auth", (req, res) => {
-  const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${process.env.INSTAGRAM_CLIENT_ID}&redirect_uri=${process.env.INSTAGRAM_REDIRECT_URI}&scope=user_profile,user_media&response_type=code`;
-  res.redirect(authUrl);
-});
-
-app.get("/auth/callback", async (req, res) => {
-  const { code } = req.query;
-  try {
-    const response = await axios.post(
-      "https://api.instagram.com/oauth/access_token",
-      {
-        client_id: process.env.INSTAGRAM_CLIENT_ID,
-        client_secret: process.env.INSTAGRAM_CLIENT_SECRET,
-        grant_type: "authorization_code",
-        redirect_uri: process.env.INSTAGRAM_REDIRECT_URI,
-        code,
-      }
-    );
-
-    const { access_token } = response.data;
-    res.send(`Access Token: ${access_token}`);
-  } catch (error) {
-    console.error("Error during authentication:", error);
-    res.status(500).send("Error during authentication");
+    console.error("Error fetching similar users:", error.message);
+    res.status(500).send("Error fetching similar users");
   }
 });
 

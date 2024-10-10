@@ -16,5 +16,5 @@ https://tailwindcss.com/docs/guides/vite
  add instagram username checker, if it's true proceed
  authenticate the backend and make it more secure
 deploy the backend and the frontend and let the client test them...
-
+finalizing
  -->

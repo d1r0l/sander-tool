@@ -15,7 +15,7 @@ const App = () => {
     setLoading(true); // Start loading
     try {
       const response = await axios.get(
-        `http://localhost:4000/user-info/${username}`,
+        `https://sander-0-tool.onrender.com/user-info/${username}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -43,12 +43,15 @@ const App = () => {
   const TestBackend = async () => {
     setLoading(true); // Start loading
     try {
-      const response = await axios.get("http://localhost:4000/test-endpoint/", {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        "https://sander-0-tool.onrender.com/test-endpoint/",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
       setFoundData(true); // Data fetched successfully
       console.log("Successfully fetched the data alhamdullah", response.data);
     } catch (error) {
@@ -58,11 +61,44 @@ const App = () => {
       setLoading(false); // Stop loading
     }
   };
+  /*
+  is_new_to_instagram = Yes/No
+Has highlights = Yes/No
+is_eligible_for_meta_verified_label = Yes/No
+has profile picture = Yes/No
+Is business account = Yes/No
+phonenumber
+mail  
+  */
 
   const userInfoData = [
     {
       title: "Full Name",
       value: profileInfo?.full_name,
+    },
+    {
+      title: "Has highlight reels",
+      value: profileInfo?.has_highlight_reels,
+    },
+    {
+      title: "Is eligible for meta verified label",
+      value: profileInfo?.is_eligible_for_meta_verified_label,
+    },
+    {
+      title: "Is business",
+      value: profileInfo?.is_business,
+    },
+    {
+      title: "Contact phone number",
+      value: profileInfo?.contact_phone_number,
+    },
+    {
+      title: "Public email",
+      value: profileInfo?.public_email,
+    },
+    {
+      title: "Is new to instagram",
+      value: profileInfo?.is_new_to_instagram,
     },
     {
       title: "Profile Pic",

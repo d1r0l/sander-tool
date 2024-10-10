@@ -79,15 +79,15 @@ islamique__page
     },
     {
       title: "Has highlight reels",
-      value: profileInfo?.has_highlight_reels.toString(),
+      value: profileInfo?.has_highlight_reels?.toString(),
     },
     {
       title: "Is eligible for meta verified label",
-      value: profileInfo?.is_eligible_for_meta_verified_label.toString(),
+      value: profileInfo?.is_eligible_for_meta_verified_label?.toString(),
     },
     {
       title: "Is business",
-      value: profileInfo?.is_business.toString(),
+      value: profileInfo?.is_business?.toString(),
     },
     {
       title: "Contact phone number",
@@ -99,7 +99,7 @@ islamique__page
     },
     {
       title: "Is new to instagram",
-      value: profileInfo?.is_new_to_instagram.toString(),
+      value: profileInfo?.is_new_to_instagram?.toString(),
     },
     {
       title: "Profile Pic",

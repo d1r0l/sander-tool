@@ -69,6 +69,7 @@ has profile picture = Yes/No
 Is business account = Yes/No
 phonenumber
 mail  
+islamique__page
   */
 
   const userInfoData = [
@@ -78,15 +79,15 @@ mail
     },
     {
       title: "Has highlight reels",
-      value: profileInfo?.has_highlight_reels,
+      value: profileInfo?.has_highlight_reels.toString(),
     },
     {
       title: "Is eligible for meta verified label",
-      value: profileInfo?.is_eligible_for_meta_verified_label,
+      value: profileInfo?.is_eligible_for_meta_verified_label.toString(),
     },
     {
       title: "Is business",
-      value: profileInfo?.is_business,
+      value: profileInfo?.is_business.toString(),
     },
     {
       title: "Contact phone number",
@@ -98,7 +99,7 @@ mail
     },
     {
       title: "Is new to instagram",
-      value: profileInfo?.is_new_to_instagram,
+      value: profileInfo?.is_new_to_instagram.toString(),
     },
     {
       title: "Profile Pic",
@@ -136,7 +137,7 @@ mail
       title: "Category",
       value: profileInfo?.category,
     },
-  ];
+  ]; 
 
   return (
     <main className="px-2 w-full overflow-y-hidden overflow-clip">

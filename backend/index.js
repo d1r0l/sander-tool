@@ -5,17 +5,14 @@ const cors = require("cors");
 const { IgApiClient } = require("instagram-private-api");
 
 dotenv.config();
-const app = express();  
+const app = express();
 
 // Use CORS
 app.use(cors());
 app.use(express.json()); // For parsing application/json
-//  getting similar users:
 
-// Login to Instagram before handling requests
+// Instagram login
 const ig = new IgApiClient();
-
-// Function to log in to Instagram
 const loginToInstagram = async (username, password) => {
   ig.state.generateDevice(username);
   try {
@@ -26,9 +23,12 @@ const loginToInstagram = async (username, password) => {
   }
 };
 
-// Endpoint to get user data
-app.get("/user-info", async (req, res) => {
-  // Instagram login credentials - you can use it...
+// Use the provided Instagram cookie
+const instagramCookie = `ig_did=D77430CA-59FF-4B82-B2F7-C820E11669FC; ig_nrcb=1; mid=ZsQjiAAEAAHtKEJP2briyAwN-GNF; datr=iCPEZlFvE2vnyfnlBZ88r9tV; ps_l=1; ps_n=1; shbid="15080\x2C61933666476\x2C1759735324:01f7d38c6e40b771400dc1a7ede4fddb1f56ed5df24ef0c51cc9f6b95bf2436b1d69b99e"; shbts="1728199324\x2C61933666476\x2C1759735324:01f79bf929d0151b5672e09e5c5b8a633d2ea793f820ad3a327f8ece62a03c7414a67ad8"; dpr=1; csrftoken=VO74vXZfBJWS91CirIS9GrxGyHZOuTMY; ds_user_id=61933666476; locale=en_US; sessionid=61933666476%3AvNkYWDwFHfDZTI%3A6%3AAYeCdgNjTNNN81YhdMnlZyWSbmbQUDy5OGNsnVTQrg; wd=1540x453; rur="LDC\x2C61933666476\x2C1760088242:01f7dd0b82b3fc34b1cc65c4c70f0ed93d3000d2d4d62d00db92c829bd198b2555ab2213"`;
+
+// Combined route to fetch user info and similar users
+app.get("/user-info/:nickname", async (req, res) => {
+  const { nickname } = req.params;
   const username = "webmind1s"; // Replace with your Instagram username
   const password = "asdf2qwrASDF234@@#$@$@!$"; // Replace with your Instagram password
 
@@ -40,54 +40,45 @@ app.get("/user-info", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
-  // Fetch user data
   try {
-    const nickname = "simply_sander";
+    // Fetch user info by nickname
     const userId = await ig.user.getIdByUsername(nickname);
- 
-    // Use the ig.user method to get user info
     const userInfo = await ig.user.info(userId);
 
-    // Send the user info as a response
-    res.json(userInfo);
-  } catch (error) {
-    console.error("Error fetching user data:", error.message);
-    res.status(500).send("Error fetching user data");
-  }
-});
-// // https://www.instagram.com/graphql/query/?query_id=17845312237175864&variables={"id":"210412485"}
-// // Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36
+    // Now fetch similar users using GraphQL query and the userId
+    const queryParams = {
+      query_id: "17845312237175864", // Query ID for similar users
+      variables: JSON.stringify({ id: userId }), // Use the fetched user ID
+    };
 
-// Use the provided Instagram cookie
-const instagramCookie = `ig_nrcb=1; datr=sxUBZxNp0EPhkFnYLBY0-gFt; ig_did=2C42E4C3-0ABF-448B-91B1-30F1A004D2D0; mid=ZwEVtQAEAAEL8Bzv3K0zW9KT8Lrj; dpr=1; csrftoken=RLFcXjjaMgrli2Zp2IYdclFqXPx0xvKD; ds_user_id=61933666476; ps_l=1; ps_n=1; shbid="15080\x2C61933666476\x2C1759864412:01f72461f836edbb066734973f0e64891102ee25d889ffd4bb8e5a83cc9b116f83d36dbc"; shbts="1728328412\x2C61933666476\x2C1759864412:01f7fe1f80a35acd8a1435edcb532f5622c0a09337be2320a7257281ae98af4cd120592a"; sessionid=61933666476%3AxbCORvcaUdeJiq%3A17%3AAYch2SMr_w6Hajpf49qtB-El1ulTJf4dMu8ekDeFig; wd=1391x496; rur="LDC\x2C61933666476\x2C1760039126:01f76677487692af10d70d6a73c2351d8f6db4e195a7c40083b3cbe9d7685f70e747b3ad"`;
+    const headers = {
+      Accept: "application/json",
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+      Cookie: instagramCookie, // Use the provided static cookie
+    };
 
-// Endpoint to get similar users
-app.get("/similar-users", async (req, res) => {
-  const queryParams = {
-    query_id: "17845312237175864", // Query ID for similar users
-    variables: JSON.stringify({ id: "210412485" }), // User ID for fetching similar users
-  };
-
-  const headers = {
-    Accept: "application/json",
-    "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-    Cookie: instagramCookie, // Use the provided static cookie
-  };
-
-  try {
-    const response = await axios.get(
+    const similarUsersResponse = await axios.get(
       `https://www.instagram.com/graphql/query/`,
       {
         params: queryParams,
         headers: headers,
       }
     );
-    res.json(response.data);
+
+    // Send both user info and similar users data as response
+    res.json({
+      userInfo,
+      similarUsers: similarUsersResponse.data,
+    });
   } catch (error) {
-    console.error("Error fetching similar users:", error.message);
-    res.status(500).send("Error fetching similar users");
+    console.error("Error fetching data:", error.message);
+    res.status(500).send("Error fetching data");
   }
+});
+// images
+app.get("/test-endpoint", async (req, res) => {
+  res.send(`Hello From The Backend, It works alhamdullah`);
 });
 
 // Start the server

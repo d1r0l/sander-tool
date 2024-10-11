@@ -28,53 +28,9 @@ const instagramCookie = `ig_did=D77430CA-59FF-4B82-B2F7-C820E11669FC; ig_nrcb=1;
 
 // Combined route to fetch user info and similar users
 app.get("/user-info/:nickname", async (req, res) => {
-  const { nickname } = req.params;
-  const username = "webmind1s"; // Replace with your Instagram username
-  const password = "asdf2qwrASDF234@@#$@$@!$"; // Replace with your Instagram password
-
-  // Login to Instagram
-  try {
-    await loginToInstagram(username, password);
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({ error: error.message });
-  }
-
-  try {
-    // Fetch user info by nickname
-    const userId = await ig.user.getIdByUsername(nickname);
-    const userInfo = await ig.user.info(userId);
-
-    // Now fetch similar users using GraphQL query and the userId
-    const queryParams = {
-      query_id: "17845312237175864", // Query ID for similar users
-      variables: JSON.stringify({ id: userId }), // Use the fetched user ID
-    };
-
-    const headers = {
-      Accept: "application/json",
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
-      Cookie: instagramCookie, // Use the provided static cookie
-    };
-
-    const similarUsersResponse = await axios.get(
-      `https://www.instagram.com/graphql/query/`,
-      {
-        params: queryParams,
-        headers: headers,
-      }
-    );
-
-    // Send both user info and similar users data as response
-    res.json({
-      userInfo,
-      similarUsers: similarUsersResponse.data,
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error.message);
-    res.status(500).send("Error fetching data");
-  }
+  console.log(
+    `Thanks!!! just I don't wanna HARAM money or something, so no need for the code that would be against their TOS(instagram...)`
+  );
 });
 // images
 app.get("/test-endpoint", async (req, res) => {

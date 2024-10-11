@@ -29,7 +29,7 @@ const instagramCookie = `ig_did=D77430CA-59FF-4B82-B2F7-C820E11669FC; ig_nrcb=1;
 // Combined route to fetch user info and similar users
 app.get("/user-info/:nickname", async (req, res) => {
   console.log(
-    `Thanks!!! just I don't wanna HARAM money or something, so no need for the code that would be against their TOS(instagram...)`
+    `Hello from /user-info profile!!`
   );
 });
 // images
